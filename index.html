@@ -29,7 +29,7 @@
           
             const renderer = new THREE.WebGLRenderer({alpha: true });
             const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+            const camera = new THREE.PerspectiveCamera( 750, window.innerWidth / window.innerHeight, 0.1, 1000 );
             
             //TEST GIT
             
@@ -102,6 +102,7 @@
                     }
 				} );
                 scene.add( gltf.scene );
+                console.log(gltf.scene.matrix.getMaxScaleOnAxis());
                 renderer.render( scene, camera );
                 const hdri = new RGBELoader();
 				hdri.load( './img/oberer_kuhberg_4k.pic', function ( texture ) {
