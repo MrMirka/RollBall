@@ -26,8 +26,8 @@
             var frameTimer=0; //Счетчик кадров
             var shadowMesh; //Тень сферы
 
-            const canvas = document.querySelector('#c');
-            const renderer = new THREE.WebGLRenderer({canvas, alpha: true });
+          
+            const renderer = new THREE.WebGLRenderer({alpha: true });
             const scene = new THREE.Scene();
             const camera = new THREE.PerspectiveCamera( 750, window.innerWidth / window.innerHeight, 0.1, 1000 );
             
@@ -191,7 +191,6 @@
             </p>
         </section>
     </div>
-    <canvas id='c'></canvas>
 
     <script>
         new fullpage('#container', {
