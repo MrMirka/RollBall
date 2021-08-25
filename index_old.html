@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BB Smooth Scrolling</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullPage.js/3.1.2/fullpage.css">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/fullPage.js/3.1.2/fullpage.js"></script>
+    <script src="https://threejs.org/build/three.js"></script>
+</head>
+
+<body>
+    <script type="module">
+            import { GLTFLoader } from './threejs-dev/examples/jsm/loaders/GLTFLoader.js';
+			import { OrbitControls } from './threejs-dev/examples/jsm/controls/OrbitControls.js';
+            import { RGBELoader } from './threejs-dev/examples/jsm/loaders/RGBELoader.js';
+            import { RoughnessMipmapper } from './threejs-dev/examples/jsm/utils/RoughnessMipmapper.js';
+
+            var clock = new THREE.Clock(); //Системные часы
+            var GoBall = false; //Состояник качения
+            var ScrollUP=false; //Скролл вверх
+            var ScrollDown=false; //Скролл вниз
+            var frameTimer=0;
+         
+
+            var fraction = 0;
+            var controls,shadowMesh;
+
+            var pointsPath = new THREE.CurvePath();
+            /*var animCurve = new THREE.Curve([new Keyframe({"time":0,"value":0,"inTangent":0,"outTangent":0,"id":"O-28","inMagnitude":-0.1,"outMagnitude":0.1}),
+                            new Keyframe({"time":0.5,"value":1,"inTangent":0,"outTangent":0,"id":"O-29","inMagnitude":-0.1,"outMagnitude":0.1}),
+                            new Keyframe({"time":1,"value":0,"inTangent":0,"outTangent":0,"id":"O-30","inMagnitude":-0.1,"outMagnitude":0.1})])*/
+            
+            const renderer = new THREE.WebGLRenderer({ alpha: true });
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera( 750, window.innerWidth / window.innerHeight, 0.1, 1000 );
+            
+            init();
+            loadMesh();
+            //Inicilization scene
+            function init(){    
+		    	renderer.setSize( window.innerWidth, window.innerHeight );
+		    	renderer.shadowMap.type = THREE.PCFSoftShadowMap; 
+		    	renderer.shadowMap.enabled = true;
+                renderer.toneMapping = THREE.ACESFilmicToneMapping;
+			    renderer.toneMappingExposure = 1;
+			    renderer.outputEncoding = THREE.sRGBEncoding;
+			    document.body.appendChild( renderer.domElement );
+                controls = new OrbitControls( camera, renderer.domElement );
+                
+                //set ligth
+                const directionalLight = new THREE.DirectionalLight( 0xffffff, 0.7 );
+                directionalLight.position.set( 2, 8, 4 );
+                directionalLight.shadow.mapSize.width = 2048; 
+                directionalLight.shadow.mapSize.height = 2048; 
+                directionalLight.shadow.radius = 20;
+                directionalLight.shadow.camera.far = 20;
+                scene.add( directionalLight );
+
+                const light = new THREE.AmbientLight( 0x404040 ); // soft white light
+                scene.add( light ); 
+
+                //+++++++++++++++++++++SHADOW IMAGE TEXTURE LOADER++++++++++++++++++++++++++++
+                const textureLoader = new THREE.TextureLoader();
+                const blendings = [
+                        { name: 'No', constant: THREE.NoBlending },
+                        { name: 'Normal', constant: THREE.NormalBlending },
+                        { name: 'Additive', constant: THREE.AdditiveBlending },
+                        { name: 'Subtractive', constant: THREE.SubtractiveBlending },
+                        { name: 'Multiply', constant: THREE.MultiplyBlending }
+                    ];
+
+                const map = textureLoader.load( './img/shadow.png' );	
+                const geo = new THREE.PlaneGeometry( 1.3, 1.3 );
+                addImage(map);
+
+
+                function addImage( map) {
+                        const blending = blendings[ 1 ];
+                        const material = new THREE.MeshBasicMaterial( { map: map } );
+                        material.transparent = true;
+                        material.blending = blending.constant;
+                        shadowMesh = new THREE.Mesh( geo, material );
+                        shadowMesh.position.set( 0, -0.2, 0 );
+                        shadowMesh.rotation.x = -1.5708;
+                        scene.add( shadowMesh );		
+}
+			//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+                //+++++++++++++++++++=ADD TEST CURVE++++++++++++++++++++++++++++++++++++++
+                const animCurve = new THREE.CubicBezierCurve3(
+                    new THREE.Vector3( -1, 0, 0 ),
+                    new THREE.Vector3( -0.20, 0, -0.1 ),
+                    new THREE.Vector3( -0.75, 0, -0.9 ),
+                    new THREE.Vector3( 0, 0, -1 ),
+                    
+                );
+                pointsPath.add(animCurve);
+
+
+                const animCurve2 = new THREE.CubicBezierCurve3(
+                    new THREE.Vector3( 0, 0, -1 ),
+                    new THREE.Vector3( 0.65, 0, -1 ),
+                    new THREE.Vector3( 0.20, 0, -0.1 ),
+                    new THREE.Vector3( 1, 0, 0 )
+                );
+                //pointsPath.add(animCurve2);
+                //pointsPath.closePath();
+
+                const points = animCurve.getPoints( 50 );
+                const geometry = new THREE.BufferGeometry().setFromPoints( points );
+                const material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
+                const curveObject = new THREE.Line( geometry, material );
+                //scene.add(curveObject);
+
+                const points2 = animCurve2.getPoints( 50 );
+                const geometry2 = new THREE.BufferGeometry().setFromPoints( points2 );
+                const material2 = new THREE.LineBasicMaterial( { color : 0xff0000 } );
+                const curveObject2 = new THREE.Line( geometry2, material2 );
+             
+                //scene.add(curveObject2);
+                //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                
+                //set camera position
+                camera.rotation.x=-1.5708;
+		    	camera.position.set( 0, 5 , 0 );
+                renderer.render( scene, camera );
+            }
+
+            function loadMesh(){
+                for(let i=1; i<=60; i++){
+                    console.log(CubicInOut(i,0,15.708,60));
+                }
+                
+                const meshLoader = new GLTFLoader();
+                const roughnessMipmapper = new RoughnessMipmapper( renderer );
+                meshLoader.load( './mesh/ball-lp2.glb', function ( gltf ) { 
+				gltf.scene.name = 'ball';
+				gltf.scene.castShadow=true;
+				gltf.scene.traverse( function( node ) {
+					if ( node.isMesh ) {
+                        //node.castShadow = true;    
+						roughnessMipmapper.generateMipmaps( node.material );
+                    }
+				} );
+                scene.add( gltf.scene );
+                renderer.render( scene, camera );
+                const hdri = new RGBELoader();
+				hdri.load( './img/oberer_kuhberg_4k.pic', function ( texture ) {
+					texture.mapping = THREE.EquirectangularReflectionMapping;
+					//scene.background = texture;
+					scene.environment = texture;
+					renderer.render( scene, camera );
+				});
+                /*OLD ANIMATION
+                const animate = function () {    
+                    //if(clock.getElapsedTime() > 0){GoBall=true;} //обработка задержки перед анимацией. Для задержки долдны быть значения > 0
+                    if(GoBall){
+                       if(ScrollUP){ 
+                         gltf.scene.rotation.x+=GetDeltaRotation(fraction);
+                         console.log(THREE.MathUtils.radToDeg(gltf.scene.rotation.x));
+                       }else if(ScrollDown){
+                        gltf.scene.rotation.x-=GetDeltaRotation(fraction);
+                        console.log(THREE.MathUtils.radToDeg(gltf.scene.rotation.x));
+                       }
+                       //fraction+=0.01666666;
+                       fraction+=0.015;
+                        if(fraction>1){fraction=1}
+                       if(clock.getElapsedTime()>1){
+                            GoBall=false;
+                            ScrollUP=false;
+                            ScrollDown=false;
+                            fraction=0;
+                       }
+                    }
+            
+                    requestAnimationFrame( animate );
+                    controls.update();
+                    renderer.render( scene, camera );
+                }*/
+
+                const animate = function () {    
+                    //if(clock.getElapsedTime() > 0){GoBall=true;} //обработка задержки перед анимацией. Для задержки долдны быть значения > 0
+                    if(GoBall){
+                       if(ScrollUP){ 
+                         gltf.scene.rotation.x=CubicInOut(frameTimer,0,15.708,59);
+                       }else if(ScrollDown){
+                        gltf.scene.rotation.x=CubicInOut(frameTimer,0,15.708,59);
+                       }
+                       frameTimer+=1;
+                       if(clock.getElapsedTime()>1){
+                            GoBall=false;
+                            ScrollUP=false;
+                            ScrollDown=false; 
+                            frameTimer=0;
+                       }
+                    }
+            
+                    requestAnimationFrame( animate );
+                    controls.update();
+                    renderer.render( scene, camera );
+                }
+
+                animate();
+
+                window.addEventListener("wheel", function(e) {
+                        if(isUp(e.deltaY)){
+                            ScrollUP=true;
+                            ScrollDown=false;
+                        }else{
+                            ScrollUP=false;
+                            ScrollDown=true;
+                        }
+                        if(!GoBall){    
+                             clock.start();	
+                             GoBall=true;
+                        }	
+						}, true);
+                
+                }, undefined, function ( error ) {
+                     console.error( error );	
+               });
+               
+             }
+
+             //Проверка направления скролла
+             function isUp(deltaY){
+                if(deltaY>0) {
+                    return true;
+                }else {
+                    return false;
+                }
+	    	};
+
+            //Угол поворота рад/сек
+            /*function GetDeltaRotation(elapseTime, time, fraction){
+                let elase
+                if(elapseTime<30){
+                    return (0.27/time)*(time);
+                } else{      
+                    return (0.27/time)*(1.5-time);        
+                }
+                
+            }*/
+
+            //OLD function
+            function GetDeltaRotation(fraction){
+                return Math.abs(pointsPath.getPoint(fraction).z * pointsPath.getPoint(fraction).x)*1.6;
+            }
+
+            //t - current time
+            //b - start value
+            //c - change value
+            //d - duration
+            function CubicInOut(t, b, c, d){
+                if ((t /= d / 2) < 1) return c / 2 * t * t * t + b;
+                return c / 2 * ((t -= 2) * t * t + 2) + b;
+            }
+
+            //Вычесляет объем сферы
+            function getVolume(radius) {
+                let volume=0;
+                volume = (4/3)*(Math.PI * Math.pow(radius, 3));
+                return volume;
+            }
+
+
+             
+             
+    </script>
+    <div class="container" id="container">
+        <section class="section" id="home">
+            <h1>BetBoom</h1>
+            <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ad saepe quia eaque laboriosam deserunt vero?
+            </p>
+        </section>
+        <section class="section" id="about">
+            <h1>Заголовок</h1>
+            <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ad saepe quia eaque laboriosam deserunt vero?
+            </p>
+        </section>
+    </div>
+
+    <script>
+        new fullpage('#container', {
+            //options here
+            autoScrolling: true,
+            scrollHorizontally: false,
+            scrollingSpeed: 1000,
+            verticalCentered: true,
+            easing: 'easeInOutCubic',
+        });
+
+
+        
+    </script>
+    
+</body>
+
+</html>
