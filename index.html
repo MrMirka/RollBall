@@ -70,6 +70,8 @@
                 const light = new THREE.AmbientLight( 0x404040 ); // soft white light
                 scene.add( light ); 
 
+
+                /*
                 //+++++++++++++++++++++SHADOW IMAGE TEXTURE LOADER++++++++++++++++++++++++++++
                 const textureLoader = new THREE.TextureLoader();
                 const blendings = [
@@ -95,6 +97,7 @@
                         shadowMesh.rotation.x = -1.5708;
                         scene.add( shadowMesh );		
 }
+*/
                 
                 //set camera position
                 camera.rotation.x=-1.5708;
@@ -131,8 +134,9 @@
                         raycaster.setFromCamera( mouse, camera );
 
                         // calculate objects intersecting the picking ray
-                        const intersects = raycaster.intersectObjects( scene.getObjectByName('ball') );
+                        const intersects = raycaster.intersectObjects( scene.children );
                         console.log("RAYs "+intersects.length);
+                        console.log("Children "+ scene.children);
 
                         for ( let i = 0; i < intersects.length; i ++ ) {
 
