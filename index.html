@@ -158,8 +158,11 @@
                     camera.aspect = window.innerWidth / window.innerHeight;
                     renderer.setSize( window.innerWidth, window.innerHeight );
                     scene.add(camera);
+                    var remObj = scene.getObjectByName('ball');
+                    scene.remove(remObj);
                     renderer.render( scene, camera );
                     console.log("W "+camera.getFilmHeight() +" W "+camera.getFilmWidth());
+                   
                   
                    
                     renderer.render( scene, camera );
