@@ -49,7 +49,7 @@ section p {
     font-size: 1.5rem;
 }
 canvas {
-    pointer-events: none;
+    /*pointer-events: none;*/
     display: block;
     position: fixed;
      top: 0;
