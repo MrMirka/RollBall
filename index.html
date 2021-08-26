@@ -88,6 +88,7 @@
                 camera.rotation.x=-1.5708;
 		    	camera.position.set( 0, 5 , 0 );
                 renderer.render( scene, camera );
+                console.log("W "+camera.getFilmHeight +" W "+camera.getFilmWidth());
             }
 
             function loadMesh(){
@@ -158,6 +159,7 @@
                     renderer.setSize( window.innerWidth, window.innerHeight );
                     scene.add(camera);
                     renderer.render( scene, camera );
+                    console.log("W "+camera.getFilmHeight +" W "+camera.getFilmWidth());
                   
                    
                     renderer.render( scene, camera );
