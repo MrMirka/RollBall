@@ -233,7 +233,8 @@
             //Вычесляет объем сферы
             function getVolume(radius) {
                 let volume=0;
-                volume = (4/3)*(Math.PI * Math.pow(radius, 3));
+                //volume = (4/3)*(Math.PI * Math.pow(radius, 3));
+                volume = 2*Math.PI*radius;
                 return volume;
             }
             //Обновляет значения при маштабировании окна
