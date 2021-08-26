@@ -160,7 +160,6 @@
                     if(BallRadius>0){console.log("BALL ROTATION "+getRotationCount(BallRadius));};
                     if(GoBall){
                        if(ScrollUP){ 
-                           console.log("BALL ROTATION "+);
                          gltf.scene.rotation.x=CubicInOut(frameTimer,0,getRotationCount(BallRadius),59);
                        }else if(ScrollDown){
                         gltf.scene.rotation.x=getRotationCount(BallRadius)-CubicInOut(frameTimer,0,getRotationCount(BallRadius),59);
