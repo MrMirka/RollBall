@@ -137,12 +137,12 @@
                     
                    
 
-                    mouse.y-=0.03;
+                    mouse.y-=0.003;
                     //++++++++RAY++++++++++++++
                     function render() {
 
                         // update the picking ray with the camera and mouse position
-                        //raycaster.setFromCamera( mouse, camera );
+                        raycaster.setFromCamera( mouse, camera );
 
                         // calculate objects intersecting the picking ray
                         const intersects = raycaster.intersectObjects( gltf.scene.children, true);
