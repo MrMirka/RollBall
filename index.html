@@ -154,7 +154,7 @@
 
              window.addEventListener("resize", function(e) {
                     console.log("GET RESIZE");
-                    camera.updateProjectionMatrix();
+                    camera.aspect = window.innerWidth / window.innerHeight;
 						}, true);
 
              //Проверка направления скролла
