@@ -91,9 +91,6 @@
             }
 
             function loadMesh(){
-                //var remObj = scene.getObjectByName('ball');
-                //scene.remove(remObj);
-
                 const meshLoader = new GLTFLoader();
                 const roughnessMipmapper = new RoughnessMipmapper( renderer );
                 meshLoader.load( './mesh/ball-lp2.glb', function ( gltf ) { 
@@ -158,9 +155,9 @@
              window.addEventListener("resize", function(e) {
                     camera.aspect = window.innerWidth / window.innerHeight;
                     camera.updateProjectionMatrix();
-                    renderer.setSize( window.innerWidth, window.innerHeight );
-                    scene.add(camera);
-                    renderer.render( scene, camera ); 
+                    //renderer.setSize( window.innerWidth, window.innerHeight );
+                    //scene.add(camera);
+                    //renderer.render( scene, camera ); 
 						}, true);
 
              //Проверка направления скролла
