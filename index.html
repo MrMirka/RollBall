@@ -40,6 +40,7 @@
             function onMouseMove( event ) {
                 mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
                 mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+                console.log("MOUSE2 "+mouse.x+ " "+mouse.y);
             }
             
             init();
@@ -131,7 +132,7 @@
                     
                    
 
-                    mouse.x-=0.03;
+                    //mouse.x-=0.03;
                     //++++++++RAY++++++++++++++
                     function render() {
 
@@ -140,13 +141,13 @@
 
                         // calculate objects intersecting the picking ray
                         const intersects = raycaster.intersectObjects( gltf.scene.children, true);
-                        console.log("RAYs2 "+intersects.far);
+                        //console.log("RAYs2 "+intersects.far);
 
                         for ( let i = 0; i < intersects.length; i ++ ) {
 
                             intersects[ i ].object.material.color.set( 0xff0000 );
-                            console.log("MOUSE "+mouse.x+ " "+mouse.y);
-                            console.log("Screen "+camera.getFilmHeight());
+                            //console.log("MOUSE "+mouse.x+ " "+mouse.y);
+                            console.log("ScreenH "+camera.getFilmHeight());
 
                         }
                 
@@ -199,7 +200,7 @@
              window.addEventListener("resize", function(e) {
                     UpdateWindow();
 						}, true);
-            //window.addEventListener( 'mousemove', onMouseMove, false );            
+            window.addEventListener( 'mousemove', onMouseMove, false );            
 
              //Проверка направления скролла
              function isUp(deltaY){
