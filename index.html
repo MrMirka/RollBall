@@ -154,10 +154,12 @@
 
              window.addEventListener("resize", function(e) {
                     console.log("GET RESIZE");
-                    //camera.aspect = window.innerWidth / window.innerHeight;
-                    //renderer.setSize( window.innerWidth, window.innerHeight );
-                    init();
-                    loadMesh();
+                    camera.aspect = window.innerWidth / window.innerHeight;
+                    renderer.setSize( window.innerWidth, window.innerHeight );
+                    scene.add(camera);
+                    renderer.render( scene, camera );
+                  
+                   
                     renderer.render( scene, camera );
 						}, true);
 
