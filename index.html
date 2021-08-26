@@ -153,11 +153,7 @@
              }
 
              window.addEventListener("resize", function(e) {
-                    camera.aspect = window.innerWidth / window.innerHeight;
-                    camera.updateProjectionMatrix();
-                    renderer.setSize( window.innerWidth, window.innerHeight );
-                    //scene.add(camera);
-                    //renderer.render( scene, camera ); 
+                    UpdateWindow();
 						}, true);
 
              //Проверка направления скролла
@@ -183,6 +179,12 @@
                 let volume=0;
                 volume = (4/3)*(Math.PI * Math.pow(radius, 3));
                 return volume;
+            }
+            //Обновляет значения при маштабировании окна
+            function UpdateWindow(){
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize( window.innerWidth, window.innerHeight );
             }
 
 
