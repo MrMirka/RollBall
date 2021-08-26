@@ -31,6 +31,8 @@
             const scene = new THREE.Scene();
             const camera = new THREE.PerspectiveCamera( 750, window.innerWidth / window.innerHeight, 0.1, 1000 );
             
+            const screenV = new THREE.Vector3();
+            
             //+++++++++++++++++TEST RAY++++++++++++++++++++++++++
             const raycaster = new THREE.Raycaster();
             const mouse = new THREE.Vector2(1,0);
@@ -98,6 +100,13 @@
             }
 
             function loadMesh(){
+
+                screenV.project( camera );
+                screenV.x = ( screenV.x + 1) * window.innerWidth / 2;
+                screenV.y = - ( screenV.y - 1) * window.innerHeight / 2;
+                screenV.z = 0;
+                console.log("Screen "+screenV.x+" "+screenV.y);
+
                 const meshLoader = new GLTFLoader();
                 const roughnessMipmapper = new RoughnessMipmapper( renderer );
                 meshLoader.load( './mesh/ball-lp2.glb', function ( gltf ) { 
@@ -119,6 +128,9 @@
 				});
 
                 const animate = function () {
+                    
+                   
+
                     mouse.x-=0.03;
                     //++++++++RAY++++++++++++++
                     function render() {
@@ -133,7 +145,7 @@
                         for ( let i = 0; i < intersects.length; i ++ ) {
 
                             intersects[ i ].object.material.color.set( 0xff0000 );
-                            console.log("MOUSE "+mouse.x+ " "+mouse.y);
+                            //console.log("MOUSE "+mouse.x+ " "+mouse.y);
 
                         }
                 
