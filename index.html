@@ -92,7 +92,14 @@
                         shadowMesh.position.set( 0, -0.2, 0 );
                         shadowMesh.rotation.x = -1.5708;
                         scene.add( shadowMesh );		
-}
+                }
+
+                const geometry = new THREE.BoxGeometry();
+                const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+                const cube = new THREE.Mesh( geometry, material );
+                scene.add( cube );
+                
+
                 
                 //set camera position
                 camera.rotation.x=-1.5708;
@@ -157,8 +164,6 @@
                     //+++++++++++++++++++++++++
                     if(GoBall){
                        if(ScrollUP){ 
-                        gltf.scene.position.x=-1;    
-                        console.log("BAL "+gltf.scene.position.x);
                          gltf.scene.rotation.x=CubicInOut(frameTimer,0,15.708,59);
                        }else if(ScrollDown){
                         gltf.scene.rotation.x=15.708-CubicInOut(frameTimer,0,15.708,59);
