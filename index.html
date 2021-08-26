@@ -155,6 +155,8 @@
              window.addEventListener("resize", function(e) {
                     console.log("GET RESIZE");
                     camera.aspect = window.innerWidth / window.innerHeight;
+                    renderer.setSize( window.innerWidth, window.innerHeight );
+                    renderer.render( scene, camera );
 						}, true);
 
              //Проверка направления скролла
