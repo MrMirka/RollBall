@@ -106,7 +106,7 @@
                 /*screenV.x = ( screenV.x + 1) * window.innerWidth / 2;
                 screenV.y = - ( screenV.y - 1) * window.innerHeight / 2;
                 screenV.z = 0;*/
-                console.log("Screen "+screenV.x+" "+screenV.z);
+               // console.log("Screen "+screenV.x+" "+screenV.z);
 
                 const meshLoader = new GLTFLoader();
                 const roughnessMipmapper = new RoughnessMipmapper( renderer );
@@ -147,7 +147,7 @@
 
                             intersects[ i ].object.material.color.set( 0xff0000 );
                             //console.log("MOUSE "+mouse.x+ " "+mouse.y);
-                            console.log("ScreenH "+camera.getFilmHeight());
+                           // console.log("ScreenH "+camera.getFilmHeight());
 
                         }
                 
@@ -158,6 +158,7 @@
                     if(GoBall){
                        if(ScrollUP){ 
                         gltf.scene.position.x=-1;    
+                        console.log("BAL "+gltf.scene.position.x);
                          gltf.scene.rotation.x=CubicInOut(frameTimer,0,15.708,59);
                        }else if(ScrollDown){
                         gltf.scene.rotation.x=15.708-CubicInOut(frameTimer,0,15.708,59);
