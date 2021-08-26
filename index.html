@@ -107,8 +107,8 @@
                 const roughnessMipmapper = new RoughnessMipmapper( renderer );
                 meshLoader.load( './mesh/ball-lp2.glb', function ( gltf ) { 
 				gltf.scene.name = 'ball';
-				//gltf.scene.castShadow=true;
-				//gltf.scene.receiveShadow=true;
+				gltf.scene.castShadow=true;
+				gltf.scene.receiveShadow=true;
 				gltf.scene.traverse( function( node ) {
 					if ( node.isMesh ) {
 						roughnessMipmapper.generateMipmaps( node.material );
