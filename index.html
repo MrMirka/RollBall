@@ -94,11 +94,6 @@
                         scene.add( shadowMesh );		
                 }
 
-                const geometry = new THREE.BoxGeometry();
-                const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-                const cube = new THREE.Mesh( geometry, material );
-                scene.add( cube );
-                cube.position.x=-1;
 
 
                 
@@ -145,7 +140,7 @@
                     function render() {
 
                         // update the picking ray with the camera and mouse position
-                        raycaster.setFromCamera( mouse, camera );
+                        //raycaster.setFromCamera( mouse, camera );
 
                         // calculate objects intersecting the picking ray
                         const intersects = raycaster.intersectObjects( gltf.scene.children, true);
