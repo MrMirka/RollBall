@@ -23,7 +23,7 @@
             var GoBall = false; //Состояник качения
             var ScrollUP=false; //Скролл вверх
             var ScrollDown=false; //Скролл вниз
-            var frameTimer=0; //Счетчик кадров
+            var frameTimer=1; //Счетчик кадров
             var shadowMesh; //Тень сферы
 
             var Ray = true;
@@ -51,6 +51,13 @@
 
             //Inicilization scene
             function init(){    
+
+                //+++++++++++++=GRID++++++++++++++
+                const size = 10;
+                const divisions = 10;
+                const gridHelper = new THREE.GridHelper( size, divisions );
+                //scene.add( gridHelper );
+                //++++++++++++++++++++++++++++++++
 		    	renderer.setSize( window.innerWidth, window.innerHeight );
 		    	renderer.shadowMap.type = THREE.PCFSoftShadowMap; 
 		    	renderer.shadowMap.enabled = true;
@@ -157,14 +164,17 @@
 
                     }
                     //+++++++++++++++++++++++++
-                    if(BallRadius>0){console.log("BALL ROTATION "+getRotationCount(BallRadius));};
+                   // if(BallRadius>0){console.log("BALL ROTATION "+getRotationCount(BallRadius));};
                     if(GoBall){
                        if(ScrollUP){ 
-                        gltf.scene.rotation.x=CubicInOut(frameTimer,0,15.708,59);
-                         //gltf.scene.rotation.x=CubicInOut(frameTimer,0,getRotationCount(BallRadius),59);
+                           console.log("DELTA "+ THREE.MathUtils.radToDeg(CubicInOut(frameTimer,0,getRotationCount(BallRadius),60)));
+                        //gltf.scene.rotation.x=CubicInOut(frameTimer,0,15.708,59);
+                        //gltf.scene.rotation.x+=getRotationCount(BallRadius)/60;
+                         gltf.scene.rotation.x=CubicInOut(frameTimer,0,getRotationCount(BallRadius),60);
                        }else if(ScrollDown){
-                        //gltf.scene.rotation.x=getRotationCount(BallRadius)-CubicInOut(frameTimer,0,getRotationCount(BallRadius),59);
-                        gltf.scene.rotation.x=15.708-CubicInOut(frameTimer,0,15.708,59);
+                        gltf.scene.rotation.x=getRotationCount(BallRadius)-CubicInOut(frameTimer,0,getRotationCount(BallRadius),60);
+                        //gltf.scene.rotation.x=15.708-CubicInOut(frameTimer,0,15.708,59);
+                        //gltf.scene.rotation.x-=getRotationCount(BallRadius)/60;
                        }
                        frameTimer+=1;
                        //При анимации дольше 1 сек останавливаем кручение мяча и обнудяем все триггеры
@@ -172,7 +182,7 @@
                             GoBall=false;
                             ScrollUP=false;
                             ScrollDown=false; 
-                            frameTimer=0;
+                            frameTimer=1;
                        }
                     }
                     render();
@@ -222,6 +232,7 @@
             //d - duration
             function CubicInOut(t, b, c, d){
                 if ((t /= d / 2) < 1) return c / 2 * t * t * t + b;
+                //return c / 2 * ((t -= 2) * t * t + 2) + b;
                 return c / 2 * ((t -= 2) * t * t + 2) + b;
             }
 
@@ -269,7 +280,9 @@
             scrollHorizontally: false,
             scrollingSpeed: 1000,
             verticalCentered: true,
-            easing: 'easeInOutCubic',
+            //easing: 'easeInOutCubic',
+            //easing: 'linear',
+            //easingcss3: 'linear',
         });
 
 
