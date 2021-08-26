@@ -107,8 +107,8 @@
                 const roughnessMipmapper = new RoughnessMipmapper( renderer );
                 meshLoader.load( './mesh/ball-lp2.glb', function ( gltf ) { 
 				gltf.scene.name = 'ball';
-				gltf.scene.castShadow=true;
-				gltf.scene.receiveShadow=true;
+				//gltf.scene.castShadow=true;
+				//gltf.scene.receiveShadow=true;
 				gltf.scene.traverse( function( node ) {
 					if ( node.isMesh ) {
 						roughnessMipmapper.generateMipmaps( node.material );
@@ -132,12 +132,12 @@
                         raycaster.setFromCamera( mouse, camera );
 
                         // calculate objects intersecting the picking ray
-                        const intersects = raycaster.intersectObjects( gltf.scene.children, true);
+                        const intersects = raycaster.intersectObjects( gltf.scene.children);
                         console.log("RAYs "+intersects.length);
 
                         for ( let i = 0; i < intersects.length; i ++ ) {
 
-                            intersects[ i ].object.material.color.set( 0xff0000 );
+                            //intersects[ i ].object.material.color.set( 0xff0000 );
 
                         }
                 
