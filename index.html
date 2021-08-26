@@ -226,6 +226,7 @@
 
             //Вычисляем количество оборотов мяча
             function getRotationCount(radius){
+                console.log("VOLUME- "+getVolume(radius)+" DATA "+radius + " COUNT "+1/getVolume(radius));
                 return (1/getVolume(radius))*6.28319;
             }
 
