@@ -92,6 +92,9 @@
             }
 
             function loadMesh(){
+                var remObj = scene.getObjectByName('ball');
+                scene.remove(remObj);
+
                 const meshLoader = new GLTFLoader();
                 const roughnessMipmapper = new RoughnessMipmapper( renderer );
                 meshLoader.load( './mesh/ball-lp2.glb', function ( gltf ) { 
@@ -158,8 +161,7 @@
                     camera.aspect = window.innerWidth / window.innerHeight;
                     renderer.setSize( window.innerWidth, window.innerHeight );
                     scene.add(camera);
-                    var remObj = scene.getObjectByName('ball');
-                    scene.remove(remObj);
+                    loadMesh();
                     renderer.render( scene, camera );
                     console.log("W "+camera.getFilmHeight() +" W "+camera.getFilmWidth());
                    
