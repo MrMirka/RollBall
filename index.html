@@ -38,7 +38,8 @@
             function onMouseMove( event ) {
 
                 // calculate mouse position in normalized device coordinates
-                // (-1 to +1) for both components
+                // (-1 to +1) for both components   
+                console.log("MOUSE "+mouse.x+ " "+ mouse.y);
 
                 mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
                 mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
@@ -132,7 +133,7 @@
                         raycaster.setFromCamera( mouse, camera );
 
                         // calculate objects intersecting the picking ray
-                        const intersects = raycaster.intersectObjects( gltf.scene.children);
+                        const intersects = raycaster.intersectObjects( gltf.scene.children, true);
                         console.log("RAYs "+intersects.length);
 
                         for ( let i = 0; i < intersects.length; i ++ ) {
