@@ -26,16 +26,26 @@
             var frameTimer=1; //Счетчик кадров
             var shadowMesh; //Тень сферы
 
-            var Ray = true;
+            var Ray = true;//Определение положения мачика
 
-            var BallRadius=0;
+            var BallRadius=0;//Радиус мяча
+
+
+            var Gpoints = []; //Переменная для хранения координат поворота мяча. !!!Временная структура для отрисовки графика
+
+
+
 
           
             const renderer = new THREE.WebGLRenderer({alpha: true });
             const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera( 750, window.innerWidth / window.innerHeight, 0.1, 1000 );
+            const camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.1, 1000 );
+            //const camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, 1, 1000 );
             
             const screenV = new THREE.Vector3();
+
+            const axesHelper = new THREE.AxesHelper( 5 );
+            scene.add( axesHelper );
             
             //+++++++++++++++++TEST RAY++++++++++++++++++++++++++
             const raycaster = new THREE.Raycaster();
@@ -49,14 +59,21 @@
             init();
             loadMesh();
 
-            //Inicilization scene
-            function init(){    
+            //+++++++++++++++Тестовая сфера+++++++++++++++++++++
+            const geometry = new THREE.SphereGeometry( 1, 33, 33 );
+                const material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+                const sphere = new THREE.Mesh( geometry, material );
+                sphere.position.set(0,0,0);
+                //scene.add( sphere );
 
-                //+++++++++++++=GRID++++++++++++++
-                const size = 10;
-                const divisions = 10;
-                const gridHelper = new THREE.GridHelper( size, divisions );
-                //scene.add( gridHelper );
+              /*  var bbox = new THREE.Box3().setFromObject(sphere);
+                 var cent = bbox.getCenter(new THREE.Vector3());
+                  var size = bbox.getSize(new THREE.Vector3());
+                console.log("Center "+cent.x +" "+cent.y+ " "+cent.z);
+                console.log("Size "+size.x +" "+size.y+ " "+size.z);*/
+            //++++++++++++++++++++++++++++++++++++++++++++++++      
+
+            function init(){    
                 //++++++++++++++++++++++++++++++++
 		    	renderer.setSize( window.innerWidth, window.innerHeight );
 		    	renderer.shadowMap.type = THREE.PCFSoftShadowMap; 
@@ -116,23 +133,25 @@
             function loadMesh(){
 
                 screenV.project( camera );
-                /*screenV.x = ( screenV.x + 1) * window.innerWidth / 2;
-                screenV.y = - ( screenV.y - 1) * window.innerHeight / 2;
-                screenV.z = 0;*/
-               // console.log("Screen "+screenV.x+" "+screenV.z);
-
                 const meshLoader = new GLTFLoader();
                 const roughnessMipmapper = new RoughnessMipmapper( renderer );
-                meshLoader.load( './mesh/ball-lp2.glb', function ( gltf ) { 
+                meshLoader.load( './mesh/ball-lp4.glb', function ( gltf ) { 
 				gltf.scene.name = 'ball';
-				//gltf.scene.castShadow=true;
-				//gltf.scene.receiveShadow=true;
 				gltf.scene.traverse( function( node ) {
 					if ( node.isMesh ) {
 						roughnessMipmapper.generateMipmaps( node.material );
+                        //const mesh = new THREE.Mesh( node, node.material );
+                        var bbox = new THREE.Box3().setFromObject(node);
+                        var cent = bbox.getCenter(new THREE.Vector3());
+                        var size = bbox.getSize(new THREE.Vector3());
+                        console.log("Center "+cent.x +" "+cent.y+ " "+cent.z);
+                        console.log("Size "+size.x +" "+size.y+ " "+size.z);
                     }
 				} );
+
+                
                 scene.add( gltf.scene );
+                
                 renderer.render( scene, camera );
                 const hdri = new RGBELoader();
 				hdri.load( './img/oberer_kuhberg_4k.pic', function ( texture ) {
@@ -145,36 +164,26 @@
                     
                    
 
-                    mouse.y-=0.003;
+                    mouse.y-=0.003;//вектор поиска объекта
+
                     //++++++++RAY++++++++++++++
                     function render() {
-
-                        // update the picking ray with the camera and mouse position
                         raycaster.setFromCamera( mouse, camera );
-
-                        // calculate objects intersecting the picking ray
                         const intersects = raycaster.intersectObjects( gltf.scene.children, true);
-                        //console.log("RAYs2 "+intersects.far);
-
                         for ( let i = 0; i < intersects.length; i ++ ) {
-                            //intersects[ i ].object.material.color.set( 0xff0000 );
                             if(Ray){BallRadius=Math.abs(mouse.y) ;Ray=false; };
                         }
                         renderer.render( scene, camera );
-
                     }
                     //+++++++++++++++++++++++++
-                   // if(BallRadius>0){console.log("BALL ROTATION "+getRotationCount(BallRadius));};
                     if(GoBall){
                        if(ScrollUP){ 
-                           console.log("DELTA "+ THREE.MathUtils.radToDeg(CubicInOut(frameTimer,0,getRotationCount(BallRadius),60)));
+                        //addObj(frameTimer, THREE.MathUtils.radToDeg(CubicInOut(frameTimer,0,getRotationCount(BallRadius),60))/1000);
+                        //console.log("DELTA "+ THREE.MathUtils.radToDeg(CubicInOut(frameTimer,0,getRotationCount(BallRadius),60))/100);
                         //gltf.scene.rotation.x=CubicInOut(frameTimer,0,15.708,59);
-                        //gltf.scene.rotation.x+=getRotationCount(BallRadius)/60;
                          gltf.scene.rotation.x=CubicInOut(frameTimer,0,getRotationCount(BallRadius),60);
                        }else if(ScrollDown){
                         gltf.scene.rotation.x=getRotationCount(BallRadius)-CubicInOut(frameTimer,0,getRotationCount(BallRadius),60);
-                        //gltf.scene.rotation.x=15.708-CubicInOut(frameTimer,0,15.708,59);
-                        //gltf.scene.rotation.x-=getRotationCount(BallRadius)/60;
                        }
                        frameTimer+=1;
                        //При анимации дольше 1 сек останавливаем кручение мяча и обнудяем все триггеры
@@ -214,8 +223,7 @@
 
              window.addEventListener("resize", function(e) {
                     UpdateWindow();
-						}, true);
-            //window.addEventListener( 'mousemove', onMouseMove, false );            
+						}, true);       
 
              //Проверка направления скролла
              function isUp(deltaY){
@@ -226,26 +234,25 @@
                 }
 	    	};
 
+            GetDim();
+
             //t - current time
             //b - start value
             //c - change value
             //d - duration
             function CubicInOut(t, b, c, d){
                 if ((t /= d / 2) < 1) return c / 2 * t * t * t + b;
-                //return c / 2 * ((t -= 2) * t * t + 2) + b;
                 return c / 2 * ((t -= 2) * t * t + 2) + b;
             }
 
             //Вычисляем количество оборотов мяча
             function getRotationCount(radius){
-                //console.log("VOLUME- "+getVolume(radius)+" DATA "+radius + " COUNT "+2/getVolume(radius));
                 return (2/getVolume(radius))*6.28319;
             }
 
-            //Вычесляет объем сферы
+            //Вычесляет длинну окружности
             function getVolume(radius) {
                 let volume=0;
-                //volume = (4/3)*(Math.PI * Math.pow(radius, 3));
                 volume = 2*Math.PI*radius;
                 return volume;
             }
@@ -257,6 +264,48 @@
             }
 
 
+            //Добавляем сферу в график. Временная структура
+            /*function addObj(frame, degree){
+                const geometry = new THREE.SphereGeometry( 0.01, 4, 3 );
+                const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+                const sphere = new THREE.Mesh( geometry, material );
+                sphere.position.x=degree;
+                sphere.position.z=frame/30;
+                scene.add( sphere );
+            }*/
+
+
+            //!!!Временная конструкция определение размера объекта, не факт что рабоатет)
+            function GetDim(){
+                var vFOV = THREE.MathUtils.degToRad( camera.fov ); // convert vertical fov to radians
+                var height = 2 * Math.tan( vFOV / 2 ) * 4.5; // visible height
+                var width = height * camera.aspect;           // visible wid
+            }
+
+            //+++++++++++++++++++++++Определяем высоыт и ширину экрана+++++++++++++++++
+            //camera -  текущая камера
+            //depth - координата на оси по которой объект удаляется от камеры
+            function  visibleHeightAtZDepth  ( depth, camera )  {
+            // compensate for cameras not positioned at z=0
+                const cameraOffset = camera.position.z;
+                if ( depth < cameraOffset ) depth -= cameraOffset;
+                else depth += cameraOffset;
+
+                // vertical fov in radians
+                const vFOV = camera.fov * Math.PI / 180; 
+
+                // Math.abs to ensure the result is always positive
+                return 2 * Math.tan( vFOV / 2 ) * Math.abs( depth );
+            };
+
+            function visibleWidthAtZDepth ( depth, camera )  {
+                const height = visibleHeightAtZDepth( depth, camera );
+                return height * camera.aspect;
+            };
+            //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+            console.log("H "+visibleHeightAtZDepth(-5,camera)+" W "+visibleWidthAtZDepth(-5,camera));
+
+
              
              
     </script>
@@ -264,7 +313,7 @@
         <section class="section" id="home">
             <h1>BetBoom</h1>
             <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ad saepe quia eaque laboriosam deserunt vero?
-            </p>
+            </p>-->
         </section>
         <section class="section" id="about">
             <h1>Заголовок</h1>
