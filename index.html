@@ -39,7 +39,7 @@
           
             const renderer = new THREE.WebGLRenderer({alpha: true });
             const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.1, 1000 );
+            const camera = new THREE.PerspectiveCamera( 750, window.innerWidth / window.innerHeight, 0.1, 1000 );
             //const camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, 1, 1000 );
             
             const screenV = new THREE.Vector3();
@@ -149,12 +149,15 @@
                     }
 				} );
 
+                gltf.scene.position.y=-100;
                 
+
                 scene.add( gltf.scene );
                 
                 renderer.render( scene, camera );
                 const hdri = new RGBELoader();
-				hdri.load( './img/oberer_kuhberg_4k.pic', function ( texture ) {
+				//hdri.load( './img/oberer_kuhberg_4k.pic', function ( texture ) {
+				hdri.load( './img/studio_small_04_256.hdr', function ( texture ) {
 					texture.mapping = THREE.EquirectangularReflectionMapping;
 					scene.environment = texture;
 					renderer.render( scene, camera );
@@ -303,7 +306,7 @@
                 return height * camera.aspect;
             };
             //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-            console.log("H "+visibleHeightAtZDepth(-5,camera)+" W "+visibleWidthAtZDepth(-5,camera));
+            console.log("H "+visibleHeightAtZDepth(-100,camera)+" W "+visibleWidthAtZDepth(-100,camera));
 
 
              
