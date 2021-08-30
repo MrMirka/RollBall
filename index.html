@@ -26,15 +26,18 @@
             var frameTimer=1; //Счетчик кадров
             var shadowMesh; //Тень сферы
             var BallSize=0;//Размер меча в пикселях
-
+           
             //Path's
             const BallPath = './mesh/ball-lp5.glb';
+            const HdriPath = './img/studio_small_04_256.hdr';
+            const ShadowOfBallPath = './img/shadow.png';
 
-
+            const calculateFov = 34.2;
+            const calculatePixels = 200;
 
             const renderer = new THREE.WebGLRenderer({alpha: true });
             const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera( 21, window.innerWidth / window.innerHeight, 0.1, 1000 );
+            const camera = new THREE.PerspectiveCamera( calculateFov, window.innerWidth / window.innerHeight, 0.1, 1000 );
             
             init();
             loadMesh();
@@ -71,7 +74,7 @@
                         { name: 'Multiply', constant: THREE.MultiplyBlending }
                     ];
 
-                const map = textureLoader.load( './img/shadow.png' );	
+                const map = textureLoader.load( ShadowOfBallPath );	
                 const geo = new THREE.PlaneGeometry( 1.3, 1.3 );
                 addImage(map);
 
@@ -107,9 +110,10 @@
                         var bbox = new THREE.Box3().setFromObject(node);
                         var cent = bbox.getCenter(new THREE.Vector3());
                         var size = bbox.getSize(new THREE.Vector3());
-                        //console.log("Center "+cent.x +" "+cent.y+ " "+cent.z);
                         console.log("Real size in unit "+size.x +" "+size.y+ " "+size.z);
+                        console.log("FOV "+ getFovByPixels(calculatePixels, size.y));
                         getVisibleBallSize(size.y);
+                    
                     }
 				} );
 
@@ -117,10 +121,11 @@
                 
 
                 scene.add( gltf.scene );
-                
                 renderer.render( scene, camera );
+
+                //Set HDRI
                 const hdri = new RGBELoader();
-				hdri.load( './img/studio_small_04_256.hdr', function ( texture ) {
+				hdri.load( HdriPath, function ( texture ) {
 					texture.mapping = THREE.EquirectangularReflectionMapping;
 					scene.environment = texture;
 					renderer.render( scene, camera );
@@ -128,15 +133,12 @@
 
                 const animate = function () {
                     
-                   
-
-                  
-                    //+++++++++++++++++++++++++
                     if(GoBall){
                        if(ScrollUP){     
-                              
                         gltf.scene.rotation.x=CubicInOut(frameTimer,0,getRotationCount(),60);
+                        //gltf.scene.rotation.x+=getRotationCount()/60;
                        }else if(ScrollDown){
+                       //gltf.scene.rotation.x-=getRotationCount()/60;
                         gltf.scene.rotation.x=getRotationCount()-CubicInOut(frameTimer,0,getRotationCount(),60);
                        }
                        frameTimer+=1;
@@ -219,17 +221,28 @@
 
 
             //Высчитывает видимый размер мяча
+            //height = 2 * Math.tan( vFOV / 2 ) * distance
+            //distanse - расстояние от камеры то ближайщей грани объекта
+            //realseze - размер мяча в юнитах
             function getVisibleBallSize(realSize){
                 var vFOV = THREE.MathUtils.degToRad( camera.fov ); 
-                var height = 2 * Math.tan( vFOV / 2 ) * (camera.position.y-(-10)-(realSize/2)); 
+                let distance = camera.position.y-(-10)-(realSize/2);
+                var height = 2 * Math.tan( vFOV/2  ) * distance; 
                 let fraction = realSize/height;
-                BallSize = innerHeight*fraction;
-                console.log("Canvas size higth in pixel "+innerHeight);
-                console.log("Visible size in pixel "+innerHeight*fraction);
+                BallSize = window.innerHeight*fraction;
+                console.log("Canvas size higth in pixel "+window.innerHeight);
+                console.log("Visible size in pixel "+BallSize);
             }
 
+            //Получаем значение Fov для конкретного размера мяча в пикселях
+            function getFovByPixels(pixel, realSize){
+                let fraction = pixel/window.innerHeight;
+                let height = realSize/fraction;
+                let distance = camera.position.y-(-10)-(realSize/2);
+                let fov = 2*(Math.PI + Math.atan( height / (2*distance)));
+                return THREE.MathUtils.radToDeg(fov)-360;
+            }
 
-             
              
     </script>
     <div class="container" id="container">
@@ -248,13 +261,14 @@
     <script>
         new fullpage('#container', {
             //options here
+            css3:false,
             autoScrolling: true,
             scrollHorizontally: false,
             scrollingSpeed: 1000,
             verticalCentered: true,
-            //easing: 'easeInOutCubic',
+            easing: 'easeInOutCubic',
             //easing: 'linear',
-            //easingcss3: 'linear',
+            easingcss3: 'false',
         });
 
 
