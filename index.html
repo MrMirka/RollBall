@@ -25,53 +25,16 @@
             var ScrollDown=false; //Скролл вниз
             var frameTimer=1; //Счетчик кадров
             var shadowMesh; //Тень сферы
-
-            var Ray = true;//Определение положения мачика
-
-            var BallRadius=0;//Радиус мяча
-
-
-            var Gpoints = []; //Переменная для хранения координат поворота мяча. !!!Временная структура для отрисовки графика
+            var BallSize=0;//Размер меча в пикселях
 
 
 
-
-          
             const renderer = new THREE.WebGLRenderer({alpha: true });
             const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera( 750, window.innerWidth / window.innerHeight, 0.1, 1000 );
-            //const camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, 1, 1000 );
-            
-            const screenV = new THREE.Vector3();
-
-            const axesHelper = new THREE.AxesHelper( 5 );
-            scene.add( axesHelper );
-            
-            //+++++++++++++++++TEST RAY++++++++++++++++++++++++++
-            const raycaster = new THREE.Raycaster();
-            const mouse = new THREE.Vector2(0,1);
-
-            function onMouseMove( event ) {
-                mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-                mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-            }
+            const camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.1, 1000 );
             
             init();
             loadMesh();
-
-            //+++++++++++++++Тестовая сфера+++++++++++++++++++++
-            const geometry = new THREE.SphereGeometry( 1, 33, 33 );
-                const material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
-                const sphere = new THREE.Mesh( geometry, material );
-                sphere.position.set(0,0,0);
-                //scene.add( sphere );
-
-              /*  var bbox = new THREE.Box3().setFromObject(sphere);
-                 var cent = bbox.getCenter(new THREE.Vector3());
-                  var size = bbox.getSize(new THREE.Vector3());
-                console.log("Center "+cent.x +" "+cent.y+ " "+cent.z);
-                console.log("Size "+size.x +" "+size.y+ " "+size.z);*/
-            //++++++++++++++++++++++++++++++++++++++++++++++++      
 
             function init(){    
                 //++++++++++++++++++++++++++++++++
@@ -90,7 +53,7 @@
                 directionalLight.shadow.mapSize.height = 2048; 
                 directionalLight.shadow.radius = 20;
                 directionalLight.shadow.camera.far = 20;
-                scene.add( directionalLight );
+                //scene.add( directionalLight );
 
                 const light = new THREE.AmbientLight( 0x404040 ); // soft white light
                 scene.add( light ); 
@@ -126,13 +89,11 @@
                 
                 //set camera position
                 camera.rotation.x=-1.5708;
-		    	camera.position.set( 0, 5 , 0 );
+		    	camera.position.set( 0, 20 , 0 );
                 renderer.render( scene, camera );
             }
 
             function loadMesh(){
-
-                screenV.project( camera );
                 const meshLoader = new GLTFLoader();
                 const roughnessMipmapper = new RoughnessMipmapper( renderer );
                 meshLoader.load( './mesh/ball-lp4.glb', function ( gltf ) { 
@@ -140,12 +101,12 @@
 				gltf.scene.traverse( function( node ) {
 					if ( node.isMesh ) {
 						roughnessMipmapper.generateMipmaps( node.material );
-                        //const mesh = new THREE.Mesh( node, node.material );
                         var bbox = new THREE.Box3().setFromObject(node);
                         var cent = bbox.getCenter(new THREE.Vector3());
                         var size = bbox.getSize(new THREE.Vector3());
-                        console.log("Center "+cent.x +" "+cent.y+ " "+cent.z);
-                        console.log("Size "+size.x +" "+size.y+ " "+size.z);
+                        //console.log("Center "+cent.x +" "+cent.y+ " "+cent.z);
+                        console.log("Real size in unit "+size.x +" "+size.y+ " "+size.z);
+                        getVisibleBallSize(size.y);
                     }
 				} );
 
@@ -156,7 +117,6 @@
                 
                 renderer.render( scene, camera );
                 const hdri = new RGBELoader();
-				//hdri.load( './img/oberer_kuhberg_4k.pic', function ( texture ) {
 				hdri.load( './img/studio_small_04_256.hdr', function ( texture ) {
 					texture.mapping = THREE.EquirectangularReflectionMapping;
 					scene.environment = texture;
@@ -167,26 +127,14 @@
                     
                    
 
-                    mouse.y-=0.003;//вектор поиска объекта
-
-                    //++++++++RAY++++++++++++++
-                    function render() {
-                        raycaster.setFromCamera( mouse, camera );
-                        const intersects = raycaster.intersectObjects( gltf.scene.children, true);
-                        for ( let i = 0; i < intersects.length; i ++ ) {
-                            if(Ray){BallRadius=Math.abs(mouse.y) ;Ray=false; };
-                        }
-                        renderer.render( scene, camera );
-                    }
+                  
                     //+++++++++++++++++++++++++
                     if(GoBall){
-                       if(ScrollUP){ 
-                        //addObj(frameTimer, THREE.MathUtils.radToDeg(CubicInOut(frameTimer,0,getRotationCount(BallRadius),60))/1000);
-                        //console.log("DELTA "+ THREE.MathUtils.radToDeg(CubicInOut(frameTimer,0,getRotationCount(BallRadius),60))/100);
-                        //gltf.scene.rotation.x=CubicInOut(frameTimer,0,15.708,59);
-                         gltf.scene.rotation.x=CubicInOut(frameTimer,0,getRotationCount(BallRadius),60);
+                       if(ScrollUP){     
+                              
+                        gltf.scene.rotation.x=CubicInOut(frameTimer,0,getRotationCount(),60);
                        }else if(ScrollDown){
-                        gltf.scene.rotation.x=getRotationCount(BallRadius)-CubicInOut(frameTimer,0,getRotationCount(BallRadius),60);
+                        gltf.scene.rotation.x=getRotationCount()-CubicInOut(frameTimer,0,getRotationCount(),60);
                        }
                        frameTimer+=1;
                        //При анимации дольше 1 сек останавливаем кручение мяча и обнудяем все триггеры
@@ -197,7 +145,7 @@
                             frameTimer=1;
                        }
                     }
-                    render();
+                    
                     requestAnimationFrame( animate );
                     renderer.render( scene, camera );
                 }
@@ -237,7 +185,7 @@
                 }
 	    	};
 
-            GetDim();
+          
 
             //t - current time
             //b - start value
@@ -249,12 +197,12 @@
             }
 
             //Вычисляем количество оборотов мяча
-            function getRotationCount(radius){
-                return (2/getVolume(radius))*6.28319;
+            function getRotationCount(){
+                return (window.innerHeight/getLengthBall(BallSize/2))*6.28319;
             }
 
             //Вычесляет длинну окружности
-            function getVolume(radius) {
+            function getLengthBall(radius) {
                 let volume=0;
                 volume = 2*Math.PI*radius;
                 return volume;
@@ -267,46 +215,15 @@
             }
 
 
-            //Добавляем сферу в график. Временная структура
-            /*function addObj(frame, degree){
-                const geometry = new THREE.SphereGeometry( 0.01, 4, 3 );
-                const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
-                const sphere = new THREE.Mesh( geometry, material );
-                sphere.position.x=degree;
-                sphere.position.z=frame/30;
-                scene.add( sphere );
-            }*/
-
-
-            //!!!Временная конструкция определение размера объекта, не факт что рабоатет)
-            function GetDim(){
-                var vFOV = THREE.MathUtils.degToRad( camera.fov ); // convert vertical fov to radians
-                var height = 2 * Math.tan( vFOV / 2 ) * 4.5; // visible height
-                var width = height * camera.aspect;           // visible wid
+            //Высчитывает видимый размер мяча
+            function getVisibleBallSize(realSize){
+                var vFOV = THREE.MathUtils.degToRad( camera.fov ); 
+                var height = 2 * Math.tan( vFOV / 2 ) * (camera.position.y-(-10)-(realSize/2)); 
+                let fraction = realSize/height;
+                BallSize = innerHeight*fraction;
+                console.log("Canvas size higth in pixel "+innerHeight);
+                console.log("Visible size in pixel "+innerHeight*fraction);
             }
-
-            //+++++++++++++++++++++++Определяем высоыт и ширину экрана+++++++++++++++++
-            //camera -  текущая камера
-            //depth - координата на оси по которой объект удаляется от камеры
-            function  visibleHeightAtZDepth  ( depth, camera )  {
-            // compensate for cameras not positioned at z=0
-                const cameraOffset = camera.position.z;
-                if ( depth < cameraOffset ) depth -= cameraOffset;
-                else depth += cameraOffset;
-
-                // vertical fov in radians
-                const vFOV = camera.fov * Math.PI / 180; 
-
-                // Math.abs to ensure the result is always positive
-                return 2 * Math.tan( vFOV / 2 ) * Math.abs( depth );
-            };
-
-            function visibleWidthAtZDepth ( depth, camera )  {
-                const height = visibleHeightAtZDepth( depth, camera );
-                return height * camera.aspect;
-            };
-            //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-            console.log("H "+visibleHeightAtZDepth(-10,camera)+" W "+visibleWidthAtZDepth(-10,camera));
 
 
              
@@ -314,12 +231,12 @@
     </script>
     <div class="container" id="container">
         <section class="section" id="home">
-            <h1>BetBoom</h1>
+         <h1>BetBoom</h1>
             <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ad saepe quia eaque laboriosam deserunt vero?
-            </p>-->
+            </p>
         </section>
         <section class="section" id="about">
-            <h1>Заголовок</h1>
+           <h1>Заголовок</h1>
             <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ad saepe quia eaque laboriosam deserunt vero?
             </p>
         </section>
