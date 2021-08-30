@@ -41,6 +41,7 @@
             
             init();
             loadMesh();
+            initCurve(scene);
 
             function init(){    
                 //++++++++++++++++++++++++++++++++
@@ -236,6 +237,7 @@
 
             //Получаем значение Fov для конкретного размера мяча в пикселях
             function getFovByPixels(pixel, realSize){
+
                 let fraction = pixel/window.innerHeight;
                 let height = realSize/fraction;
                 let distance = camera.position.y-(-10)-(realSize/2);
@@ -243,7 +245,19 @@
                 return THREE.MathUtils.radToDeg(fov)-360;
             }
 
-             
+             function initCurve(scene){
+                 const curve = new THREE.CubicBezierCurve3(
+                     new THREE.Vector3(-5,0,-5),
+                     new THREE.Vector3(-3,0,3.2),
+                     new THREE.Vector3(2.6,0,1.1),
+                     new THREE.Vector3(5,0,5)
+                 );
+                 const points = curve.getPoints(50);
+                 const geometry = new THREE.BufferGeometry().setFromPoints(points);
+                 const material= new THREE.LineBasicMaterial({color: 0xff0000});
+                 const curveObject = new THREE.Line(geometry, material);
+                 scene.add(curveObject);
+             }
     </script>
     <div class="container" id="container">
         <section class="section" id="home">
