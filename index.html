@@ -27,11 +27,14 @@
             var shadowMesh; //Тень сферы
             var BallSize=0;//Размер меча в пикселях
 
+            //Path's
+            const BallPath = './mesh/ball-lp5.glb';
+
 
 
             const renderer = new THREE.WebGLRenderer({alpha: true });
             const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.1, 1000 );
+            const camera = new THREE.PerspectiveCamera( 21, window.innerWidth / window.innerHeight, 0.1, 1000 );
             
             init();
             loadMesh();
@@ -96,7 +99,7 @@
             function loadMesh(){
                 const meshLoader = new GLTFLoader();
                 const roughnessMipmapper = new RoughnessMipmapper( renderer );
-                meshLoader.load( './mesh/ball-lp4.glb', function ( gltf ) { 
+                meshLoader.load( BallPath, function ( gltf ) { 
 				gltf.scene.name = 'ball';
 				gltf.scene.traverse( function( node ) {
 					if ( node.isMesh ) {
