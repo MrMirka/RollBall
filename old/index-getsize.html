@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BB Smooth Scrolling</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullPage.js/3.1.2/fullpage.css">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/fullPage.js/3.1.2/fullpage.js"></script>
+    <script src="https://threejs.org/build/three.js"></script>
+</head>
+
+<body>
+    <script type="module">
+            import { GLTFLoader } from './threejs-dev/examples/jsm/loaders/GLTFLoader.js';
+			import { OrbitControls } from './threejs-dev/examples/jsm/controls/OrbitControls.js';
+            import { RGBELoader } from './threejs-dev/examples/jsm/loaders/RGBELoader.js';
+            import { RoughnessMipmapper } from './threejs-dev/examples/jsm/utils/RoughnessMipmapper.js';
+
+     var renderer, scene,camera;       
+
+            const visibleHeightAtZDepth = ( depth, camera ) => {
+                    // compensate for cameras not positioned at z=0
+                    const cameraOffset = camera.position.z;
+                    if ( depth < cameraOffset ) depth -= cameraOffset;
+                    else depth += cameraOffset;
+
+                    // vertical fov in radians
+                    const vFOV = camera.fov * Math.PI / 180; 
+
+                    // Math.abs to ensure the result is always positive
+                    return 2 * Math.tan( vFOV / 2 ) * Math.abs( depth );
+};
+
+                    const visibleWidthAtZDepth = ( depth, camera ) => {
+                    const height = visibleHeightAtZDepth( depth, camera );
+                    return height * camera.aspect;
+};
+
+// Simple three.js example
+
+var mesh, renderer, scene, camera, controls;
+
+init();
+animate();
+
+function init() {
+
+    // renderer
+    renderer = new THREE.WebGLRenderer();
+    renderer.setSize( window.innerWidth, window.innerHeight );
+    document.body.appendChild( renderer.domElement );
+
+    // scene
+    scene = new THREE.Scene();
+    
+    // camera
+    camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
+    camera.position.set( 0, 0, 20 );
+
+    // controls
+    controls = new OrbitControls( camera, renderer.domElement );
+    
+    // ambient
+    scene.add( new THREE.AmbientLight( 0x222222 ) );
+    
+    // light
+    var light = new THREE.DirectionalLight( 0xffffff, 1 );
+    light.position.set( 0, 20, 0 );
+    scene.add( light );
+    
+    // full width red rectangle at z = -100
+    //onst redGeom = new THREE.SphereGeometry( visibleWidthAtZDepth( -100, camera), visibleWidthAtZDepth( -100, camera), visibleWidthAtZDepth( -100, camera) );
+    const redGeom = new THREE.BoxBufferGeometry( visibleWidthAtZDepth( -100, camera), 1, 1 );
+    const redMat = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+    const redMesh = new THREE.Mesh( redGeom, redMat );
+    redMesh.position.set( 0, 0, -100 );
+  
+    // full width blue rectangle at z = -10
+    const blueGeom = new THREE.BoxBufferGeometry( visibleWidthAtZDepth( -10, camera), 1, 1 );
+    const blueMat = new THREE.MeshBasicMaterial( { color: 0x0000ff } );
+    const blueMesh = new THREE.Mesh( blueGeom, blueMat );
+    blueMesh.position.set( 0, 5, -10 );
+  
+    // full height green rectangle at z = -50
+    const greenGeom = new THREE.BoxBufferGeometry( 1, visibleHeightAtZDepth( -50, camera), 1 );
+    const greenMat = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+    const greenMesh = new THREE.Mesh( greenGeom, greenMat );
+    greenMesh.position.set( 0, 0, -50 );
+  
+    // full screen white rectangle at z = -500
+    const whiteGeom = new THREE.BoxBufferGeometry( 1, 1, 1 );
+    const whiteMat = new THREE.MeshBasicMaterial( { color: 0xffffff } );
+    const whiteMesh = new THREE.Mesh( whiteGeom, whiteMat );
+    whiteMesh.position.set( 0, 0, -200 );
+    whiteMesh.scale.set( visibleWidthAtZDepth( -200, camera), visibleHeightAtZDepth( -200, camera), 1 );
+  
+    scene.add( redMesh, blueMesh, greenMesh, whiteMesh );
+    
+}
+
+function animate() {
+
+    requestAnimationFrame( animate );
+    
+    //controls.update();
+
+    renderer.render( scene, camera );
+
+}
+             
+             
+    </script>
+    <!--<div class="container" id="container">
+        <section class="section" id="home">
+           -- <h1>BetBoom</h1>
+            <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ad saepe quia eaque laboriosam deserunt vero?
+            </p>
+        </section>
+        <section class="section" id="about">
+            <h1>Заголовок</h1>
+            <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ad saepe quia eaque laboriosam deserunt vero?
+            </p>
+        </section>
+    </div>-->
+
+    <script>
+        new fullpage('#container', {
+            //options here
+            autoScrolling: true,
+            scrollHorizontally: false,
+            scrollingSpeed: 1000,
+            verticalCentered: true,
+            //easing: 'easeInOutCubic',
+            //easing: 'linear',
+            //easingcss3: 'linear',
+        });
+
+
+        
+    </script>
+    
+</body>
+
+</html>
