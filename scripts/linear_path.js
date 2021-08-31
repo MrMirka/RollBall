@@ -1,8 +1,8 @@
 
-            import { GLTFLoader } from '../threejs-dev/examples/jsm/loaders/GLTFLoader.js';
-			import { OrbitControls } from '../threejs-dev/examples/jsm/controls/OrbitControls.js';
-            import { RGBELoader } from '../threejs-dev/examples/jsm/loaders/RGBELoader.js';
-            import { RoughnessMipmapper } from '../threejs-dev/examples/jsm/utils/RoughnessMipmapper.js';
+            import { GLTFLoader } from './threejs-dev/examples/jsm/loaders/GLTFLoader.js';
+			import { OrbitControls } from './threejs-dev/examples/jsm/controls/OrbitControls.js';
+            import { RGBELoader } from './threejs-dev/examples/jsm/loaders/RGBELoader.js';
+            import { RoughnessMipmapper } from './threejs-dev/examples/jsm/utils/RoughnessMipmapper.js';
 
             var clock = new THREE.Clock(); //Системные часы
             var GoBall = false; //Состояник качения
@@ -13,12 +13,12 @@
             var BallSize=0;//Размер меча в пикселях
            
             //Path's
-            const BallPath = '../mesh/ball-lp5.glb';
-            const HdriPath = '../img/studio_small_04_256.hdr';
-            const ShadowOfBallPath = '../img/shadow.png';
+            const BallPath = './mesh/ball-lp5.glb';
+            const HdriPath = './img/studio_small_04_256.hdr';
+            const ShadowOfBallPath = './img/shadow.png';
 
             const calculateFov = 34.2;
-            const calculatePixels = 200;
+            const calculatePixels = 200; //Исходя из этого значения рассчитывается, какое долдно быть FOV, что бы видимый размер мяча составлял это значение
 
             const renderer = new THREE.WebGLRenderer({alpha: true });
             const scene = new THREE.Scene();
