@@ -26,6 +26,12 @@
             var frameTimer=1; //Счетчик кадров
             var shadowMesh; //Тень сферы
             var BallSize=0;//Размер меча в пикселях
+            var fraction; //Значение сдвига по кривой для движеиня мяча
+            var up, axis, radians; //Для рассчета квентилиона
+            var newPosition; //Позиция для смещения мяча по кривой
+            var tangent;
+            var StartBall; //Стартовая позиция мяча на кривой
+            var pointsPath; // Массив координато кривой
            
             //Path's
             const BallPath = './mesh/ball-lp5.glb';
@@ -40,8 +46,10 @@
             const camera = new THREE.PerspectiveCamera( calculateFov, window.innerWidth / window.innerHeight, 0.1, 1000 );
             
             init();
-            loadMesh();
             initCurve(scene);
+            initMotionCurveData();
+            loadMesh();
+            
 
             function init(){    
                 //++++++++++++++++++++++++++++++++
@@ -110,16 +118,12 @@
 						roughnessMipmapper.generateMipmaps( node.material );
                         var bbox = new THREE.Box3().setFromObject(node);
                         var cent = bbox.getCenter(new THREE.Vector3());
-                        var size = bbox.getSize(new THREE.Vector3());
-                        console.log("Real size in unit "+size.x +" "+size.y+ " "+size.z);
-                        console.log("FOV "+ getFovByPixels(calculatePixels, size.y));
-                        getVisibleBallSize(size.y);
-                    
+                        var size = bbox.getSize(new THREE.Vector3());          
                     }
 				} );
-
-                gltf.scene.position.y=-10;
-                
+                console.log("Fraction "+fraction);
+                StartBall = pointsPath.getPoint(fraction);
+                gltf.scene.position.copy(StartBall);
 
                 scene.add( gltf.scene );
                 renderer.render( scene, camera );
@@ -136,11 +140,12 @@
                     
                     if(GoBall){
                        if(ScrollUP){     
-                        gltf.scene.rotation.x=CubicInOut(frameTimer,0,getRotationCount(),60);
-                        //gltf.scene.rotation.x+=getRotationCount()/60;
+                        fraction=CubicInOut(frameTimer,0,1,60);
+                        if(fraction>1){fraction=1;}
                        }else if(ScrollDown){
-                       //gltf.scene.rotation.x-=getRotationCount()/60;
-                        gltf.scene.rotation.x=getRotationCount()-CubicInOut(frameTimer,0,getRotationCount(),60);
+                           
+                        fraction=1-CubicInOut(frameTimer,0,1,60);
+                        if(fraction<=0){fraction=0;}
                        }
                        frameTimer+=1;
                        //При анимации дольше 1 сек останавливаем кручение мяча и обнудяем все триггеры
@@ -151,6 +156,14 @@
                             frameTimer=1;
                        }
                     }
+                    //Move ball
+                    newPosition = pointsPath.getPoint(fraction);
+                    tangent = pointsPath.getTangent(fraction);
+                    gltf.scene.position.copy(newPosition);
+                    axis.crossVectors(up, tangent).normalize();
+                    radians = Math.acos(up.dot(tangent));
+                    gltf.scene.quaternion.setFromAxisAngle( axis, radians );
+
                     
                     requestAnimationFrame( animate );
                     renderer.render( scene, camera );
@@ -246,17 +259,24 @@
             }
 
              function initCurve(scene){
-                 const curve = new THREE.CubicBezierCurve3(
-                     new THREE.Vector3(-5,0,-5),
-                     new THREE.Vector3(-3,0,3.2),
-                     new THREE.Vector3(2.6,0,1.1),
-                     new THREE.Vector3(5,0,5)
+                pointsPath = new THREE.CurvePath();
+                const curve = new THREE.CubicBezierCurve3(
+                     new THREE.Vector3(-5,-10,-5),
+                     new THREE.Vector3(-3,-10,3.2),
+                     new THREE.Vector3(2.6,-10,1.1),
+                     new THREE.Vector3(5,-10,5)
                  );
+                 pointsPath.add(curve);
                  const points = curve.getPoints(50);
                  const geometry = new THREE.BufferGeometry().setFromPoints(points);
                  const material= new THREE.LineBasicMaterial({color: 0xff0000});
                  const curveObject = new THREE.Line(geometry, material);
                  scene.add(curveObject);
+             }
+             function initMotionCurveData(){
+                fraction=0;
+                up = new THREE.Vector3(0,0,1);
+                axis = new THREE.Vector3();
              }
     </script>
     <div class="container" id="container">
