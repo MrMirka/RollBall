@@ -13,11 +13,11 @@
             var BallSize=0;//Размер меча в пикселях
            
             //Path's
-            const BallPath = '../mesh/ball-lp5.glb';
-            const HdriPath = '../img/studio_small_04_256.hdr';
-            const ShadowOfBallPath = '../img/shadow.png';
+            const BallPath = './mesh/ball-lp5.glb';
+            const HdriPath = './img/studio_small_04_256.hdr';
+            const ShadowOfBallPath = './img/shadow.png';
 
-            const calculateFov = 34.2;
+            const calculateFov = 33;
             const calculatePixels = 200; //Исходя из этого значения рассчитывается, какое долдно быть FOV, что бы видимый размер мяча составлял это значение
 
             const renderer = new THREE.WebGLRenderer({alpha: true });
