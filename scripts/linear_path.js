@@ -217,7 +217,7 @@
                 BallSize = window.innerHeight*fraction;
                 console.log("Canvas size higth in pixel "+window.innerHeight);
                 console.log("Visible size in pixel "+BallSize);
-                console.log("TEST TEST TEst")
+                
             }
 
             //Получаем значение Fov для конкретного размера мяча в пикселях
