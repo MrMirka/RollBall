@@ -22,9 +22,9 @@ var pathLength; // Длинна пути
 var unitSize; //Размер мяча в юнитах
 
 //Path's
-const BallPath = '../mesh/ball-lp5.glb';
-const HdriPath = '../img/studio_small_04_256.hdr';
-const ShadowOfBallPath = '../img/shadow.png';
+const BallPath = './mesh/ball-lp5.glb';
+const HdriPath = './img/studio_small_04_256.hdr';
+const ShadowOfBallPath = './img/shadow.png';
 
 const calculateFov = 34.2;
 const calculatePixels = 200;
